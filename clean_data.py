@@ -14,6 +14,9 @@ for col in time_cols1:
 df1["rat_duration"] = (df1["rat_period_end"] - df1["rat_period_start"]).dt.total_seconds()
 df1["time_to_food"] = pd.to_timedelta(df1["bat_landing_to_food"], errors="coerce")
 
+# handle missing values
+df1["habit"] = df1["habit"].fillna("Unknown")
+
 # Drop rows where critical time values are missing
 df1 = df1.dropna(subset=["start_time", "sunset_time"])
 
