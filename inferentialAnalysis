@@ -1,19 +1,18 @@
-# Importing the libraries that we will need for data handling and visualisation
+# Importing the libraries
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import chi2_contingency
+from scipy.stats import chi2_contingency, ttest_ind, shapiro
 from math import sqrt
 
-# Loading cleaned dataset which was prepared earlier 
+# Loading cleaned dataset
 cleaned_df1 = pd.read_csv("CleanDataset1.csv")
 cleaned_df1["time_to_food"] = cleaned_df1["time_to_food"].apply(pd.to_timedelta, errors="coerce")
 
 # 1. Chi-square Test: Risk-taking vs Reward
 print("\nChi-square Test: Risk vs Reward")
 
-# Contingency table
 crosstab = cleaned_df1.groupby(["risk", "reward"]).size().unstack(fill_value=0)
 chi2, p, dof, expected = chi2_contingency(crosstab)
 
@@ -21,17 +20,29 @@ print("Contingency Table:")
 print(crosstab)
 print(f"chi2 = {chi2:.2f}, p = {p:.4f}, dof = {dof}")
 
-# Effect size: Cramér's V
 n = crosstab.sum().sum()
 cramers_v = sqrt(chi2 / (n * (min(crosstab.shape) - 1)))
 print(f"Cramér's V = {cramers_v:.3f} (effect size)")
 
-if p < 0.05:
-    print("Significant relationship: Risk-taking behaviour is linked to rewards.")
-else:
-    print("No significant relationship between risk-taking and rewards.")
-
-# Plot: Risk vs Reward counts
 sns.heatmap(crosstab, annot=True, fmt="d", cmap="Blues")
 plt.title("Risk-taking vs Reward (Counts)")
+plt.show()
+
+# 2. T-test: Hesitation vs Rat Duration
+print("\nT-test: Hesitation vs Rat Duration")
+
+median_duration = cleaned_df1["rat_duration"].median()
+cleaned_df1["rat_group"] = np.where(cleaned_df1["rat_duration"] <= median_duration, "Short Rat Presence", "Long Rat Presence")
+
+short_rats = cleaned_df1[cleaned_df1["rat_group"] == "Short Rat Presence"]["time_to_food"].dropna().dt.total_seconds()
+long_rats = cleaned_df1[cleaned_df1["rat_group"] == "Long Rat Presence"]["time_to_food"].dropna().dt.total_seconds()
+
+t_stat, p_val = ttest_ind(short_rats, long_rats, equal_var=False)
+print(f"t = {t_stat:.2f}, p = {p_val:.4f}")
+
+# Plot: Boxplot of hesitation time
+sns.boxplot(x="rat_group", y=cleaned_df1["time_to_food"].dt.total_seconds(), data=cleaned_df1, palette="Set2")
+plt.title("Bat Hesitation Time vs Rat Duration Group")
+plt.xlabel("Rat Presence Group")
+plt.ylabel("Time to Food (seconds)")
 plt.show()
