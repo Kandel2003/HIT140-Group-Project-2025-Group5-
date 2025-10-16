@@ -10,7 +10,7 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
  
 # reading the cleaned dataset
-bat = pd.read_csv("Assignment3/Cleaned_Dataset1.csv")
+bat = pd.read_csv("Cleaned_Dataset1.csv")
 print(" Dataset Loaded Successfully")
 print(bat.info())
 print(bat.describe())
@@ -59,7 +59,7 @@ print("\n Linear Regression Evaluation ")
 print(f"R² Score: {r2:.3f}")
 print(f"MSE: {mse:.3f}")
 print(f"MAE: {mae:.3f}")
-
+ 
 # Printing model coefficients so we can see which features move predictions
 coef_df = pd.DataFrame({'Variable': X.columns, 'Coefficient': lr.coef_})
 print("\nRegression Coefficients:\n", coef_df)
@@ -70,7 +70,7 @@ plt.title("Predicted vs Actual (seconds_after_rat_arrival)")
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.show()
-
+ 
 residuals = y_test - y_pred
 sns.histplot(residuals, kde=True, color='purple')
 plt.title("Residual Distribution of Linear Regression")
@@ -81,4 +81,31 @@ plt.title("Bat Risk-taking vs Hours After Sunset")
 plt.xlabel("Hours After Sunset")
 plt.ylabel("Average Risk Behaviour")
 plt.show()
+ 
+# optimising with Ridge and Lasso by using grid search to improve generalisation
+alphas = np.logspace(-4, 4, 50)
+ 
+# Ridge Regression
+ridge = Ridge()
+ridge_cv = GridSearchCV(ridge, param_grid={'alpha': alphas}, scoring='r2', cv=5)
+ridge_cv.fit(X_train_scaled, y_train)
+ridge_best = ridge_cv.best_estimator_
+y_ridge_pred = ridge_best.predict(X_test_scaled)
+print("\n Ridge Regression Evaluation ")
+print(f"Best alpha: {ridge_cv.best_params_['alpha']}")
+print(f"R²: {r2_score(y_test, y_ridge_pred):.3f}")
+print(f"MSE: {mean_squared_error(y_test, y_ridge_pred):.3f}")
+print(f"MAE: {mean_absolute_error(y_test, y_ridge_pred):.3f}")
+ 
+# Lasso Regression
+lasso = Lasso(max_iter=10000)
+lasso_cv = GridSearchCV(lasso, param_grid={'alpha': alphas}, scoring='r2', cv=5)
+lasso_cv.fit(X_train_scaled, y_train)
+lasso_best = lasso_cv.best_estimator_
+y_lasso_pred = lasso_best.predict(X_test_scaled)
+print("\n Lasso Regression Evaluation ")
+print(f"Best alpha: {lasso_cv.best_params_['alpha']}")
+print(f"R²: {r2_score(y_test, y_lasso_pred):.3f}")
+print(f"MSE: {mean_squared_error(y_test, y_lasso_pred):.3f}")
+print(f"MAE: {mean_absolute_error(y_test, y_lasso_pred):.3f}")
  
