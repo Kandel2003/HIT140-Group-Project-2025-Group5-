@@ -71,3 +71,30 @@ if {"bat_landing_number","rat_arrival_number"}.issubset(rat.columns):
     ax.set_xlabel("Rat Arrival Number"); ax.set_ylabel("Bat Landing Number")
     ax.set_title(f"Species Interaction Analysis (r={corr:.3f}, p={p:.4f})")
     ax.legend(); ax.grid(alpha=0.3); plt.show()
+
+    # Testing t-tests, Kruskal-Wallis, chi-square
+
+print("\n STATISTICAL ANALYSIS \n")
+
+# Testing pairwise t-tests by season for numeric variables
+winter, spring, summer = rat[rat["season"]=="Winter"], rat[rat["season"]=="Spring"], rat[rat["season"]=="Summer"]
+for variable in ["bat_landing_number","rat_arrival_number","food_availability"]:
+    if variable in rat.columns:
+        print(f"\n{variable} seasonal differences:")
+        for s1, s2 in [("Winter","Spring"), ("Winter","Summer"), ("Spring","Summer")]:
+            a = rat[rat["season"]==s1][variable].dropna()
+            b = rat[rat["season"]==s2][variable].dropna()
+            if len(a)>1 and len(b)>1:
+                t, p = ttest_ind(a, b, equal_var=False)
+                print(f"  {s1} vs {s2}: t={t:.3f}, p={p:.4f}")
+
+# Testing association between season and risk behaviour using chi-square
+ct = pd.crosstab(bat["season_label"], bat["risk"])
+chi2, pv, _, _ = stats.chi2_contingency(ct)
+print(f"\nRisk-Season Association: chi2={chi2:.3f}, p={pv:.4f}")
+
+# Testing non-parametric check across seasons for rat arrivals using Kruskal-Wallis
+groups = [rat[rat["season"]==s]["rat_arrival_number"].dropna() for s in ["Winter","Spring","Summer"]]
+H, p = kruskal(*groups)
+print(f"Kruskal-Wallis (Rat arrivals): H={H:.3f}, p={p:.4f}")
+
