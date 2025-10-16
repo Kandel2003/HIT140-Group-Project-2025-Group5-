@@ -10,7 +10,7 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import StandardScaler
  
 # reading the cleaned dataset
-bat = pd.read_csv("Cleaned_Dataset1.csv")
+bat = pd.read_csv("Assignment3/Cleaned_Dataset1.csv")
 print(" Dataset Loaded Successfully")
 print(bat.info())
 print(bat.describe())
