@@ -59,3 +59,14 @@ print("\n Linear Regression Evaluation ")
 print(f"R² Score: {r2:.3f}")
 print(f"MSE: {mse:.3f}")
 print(f"MAE: {mae:.3f}")
+
+# Printing model coefficients so we can see which features move predictions
+coef_df = pd.DataFrame({'Variable': X.columns, 'Coefficient': lr.coef_})
+print("\nRegression Coefficients:\n", coef_df)
+ 
+# Plotting predicted vs actual, residuals, and risk trends
+plt.scatter(y_test, y_pred, alpha=0.7, color='teal')
+plt.title("Predicted vs Actual (seconds_after_rat_arrival)")
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.show()
