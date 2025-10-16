@@ -70,3 +70,15 @@ plt.title("Predicted vs Actual (seconds_after_rat_arrival)")
 plt.xlabel("Actual Values")
 plt.ylabel("Predicted Values")
 plt.show()
+
+residuals = y_test - y_pred
+sns.histplot(residuals, kde=True, color='purple')
+plt.title("Residual Distribution of Linear Regression")
+plt.show()
+ 
+sns.lineplot(x='hours_after_sunset', y='risk', data=bat, marker='o', color='darkblue')
+plt.title("Bat Risk-taking vs Hours After Sunset")
+plt.xlabel("Hours After Sunset")
+plt.ylabel("Average Risk Behaviour")
+plt.show()
+ 
